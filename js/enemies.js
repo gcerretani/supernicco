@@ -77,6 +77,7 @@ export class JuveFan {
     this._speed = 2.2;
     this._time  = 0;
     this.dead   = false;
+    this.enemyType = 'juve';
 
     const h = getHeightAt(x, z);
     this.mesh.position.set(x, h + 0.55, z);
@@ -137,6 +138,7 @@ export class BarrelEnemy {
     this._startZ = z;
     this._speed  = 4.5;
     this.dead    = false;
+    this.enemyType = 'barrel';
 
     const h = getHeightAt(x, z);
     this.mesh.position.set(x, h + 0.38, z);

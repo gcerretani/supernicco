@@ -15,10 +15,7 @@ body{background:#000;font-family:'Arial Black',Arial,sans-serif;overflow:hidden;
 }
 
 /* Start */
-.logo{
-  line-height:1;margin-bottom:.6rem;
-  text-shadow:3px 3px 0 #000;
-}
+.logo{line-height:1;margin-bottom:.6rem;text-shadow:3px 3px 0 #000;}
 .logo-super{font-size:3.5rem;font-weight:900;color:#fff;letter-spacing:6px;}
 .logo-nicco{font-size:5rem;font-weight:900;color:#0066cc;letter-spacing:4px;
   -webkit-text-stroke:2px #0099ff;text-stroke:2px #0099ff;}
@@ -47,77 +44,42 @@ body{background:#000;font-family:'Arial Black',Arial,sans-serif;overflow:hidden;
   z-index:50;pointer-events:none;
 }
 #h-balls{color:#e8e8e8;}
-#h-power{
-  color:#00ccff;font-size:.9rem;letter-spacing:2px;
-  animation:blink .45s infinite alternate;
-}
+#h-power{color:#00ccff;font-size:.9rem;letter-spacing:2px;animation:blink .45s infinite alternate;}
 #h-timer{color:#e8e8e8;}
 #h-timer.urgent{color:#ff4444;animation:blink .45s infinite alternate;}
 @keyframes blink{from{opacity:1;}to{opacity:.3;}}
 
-/* ── Mobile D-pad ── */
+/* ── Mobile controls ── */
 #mobile-controls{
-  position:fixed;bottom:0;left:0;right:0;
-  display:flex;align-items:flex-end;justify-content:space-between;
-  padding:10px 22px 18px;
+  position:fixed;inset:0;
   pointer-events:none;
   z-index:50;
 }
-#dpad{
-  display:flex;flex-direction:column;align-items:center;
-  gap:3px;pointer-events:auto;
+/* NippleJS zone: left half of screen, bottom 55% */
+#zone-joy{
+  position:absolute;
+  bottom:0;left:0;
+  width:55%;height:55%;
+  pointer-events:auto;
 }
-.dp-mid{display:flex;align-items:center;gap:3px;}
-.dp-btn{
-  width:64px;height:64px;border-radius:12px;
-  background:rgba(0,0,0,.58);border:2.5px solid rgba(0,153,255,.7);
-  color:#fff;font-size:1.6rem;
-  cursor:pointer;touch-action:none;pointer-events:auto;
-  display:flex;align-items:center;justify-content:center;
-  transition:background .1s;
-  -webkit-user-select:none;
-}
-.dp-btn:active,.dp-btn.pressed{background:rgba(0,102,204,.75);}
-.dp-center{width:64px;height:64px;}
+/* Jump button: bottom-right */
 #btn-jump{
-  width:96px;height:96px;border-radius:50%;
+  position:absolute;
+  bottom:30px;right:26px;
+  width:90px;height:90px;border-radius:50%;
   background:rgba(0,102,204,.72);color:#fff;
   border:3px solid #0099ff;font-size:1rem;font-weight:900;
   cursor:pointer;touch-action:none;pointer-events:auto;
-  letter-spacing:1px;line-height:1.2;
+  letter-spacing:1px;
   box-shadow:0 4px 20px rgba(0,102,204,.5);
   -webkit-user-select:none;
 }
 #btn-jump:active{background:rgba(0,60,180,.85);}
 
-/* Mobile hint on start screen */
-#hint-mobile{
-  display:flex;align-items:center;gap:1.2rem;
-  margin:.5rem 0 1.5rem;padding:.8rem 1.2rem;
-  background:rgba(0,102,204,.12);border:1px solid rgba(0,153,255,.3);
-  border-radius:12px;
-}
-.hint-dpad{display:flex;flex-direction:column;align-items:center;gap:3px;}
-.hint-row{display:flex;gap:3px;}
-.hint-key{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:34px;height:34px;background:rgba(0,0,0,.5);
-  border:1.5px solid rgba(0,153,255,.6);border-radius:6px;
-  font-size:.9rem;color:#fff;
-}
-.hint-key-center{border:none;background:transparent;}
-.hint-plus{font-size:1.4rem;color:#555;}
-.hint-jump-preview{
-  width:60px;height:60px;border-radius:50%;
-  background:rgba(0,102,204,.6);border:2px solid #0099ff;
-  display:flex;align-items:center;justify-content:center;
-  color:#fff;font-size:.8rem;font-weight:900;letter-spacing:1px;
-}
-
 /* Game Over */
 #screen-over{background:rgba(8,0,0,.93);}
-#screen-over h2{font-size:2.4rem;color:#ff4444;margin:.8rem 0 .4rem;}
-#screen-over p{color:#888;margin-bottom:2rem;}
+#screen-over h2{font-size:2.2rem;color:#ff4444;margin:.8rem 0 .4rem;}
+#screen-over p{color:#aaa;margin-bottom:2rem;font-size:1rem;max-width:320px;text-align:center;}
 
 /* Win Card */
 #screen-win{
@@ -138,17 +100,13 @@ body{background:#000;font-family:'Arial Black',Arial,sans-serif;overflow:hidden;
 .card-title{font-size:2.1rem;color:#fff;margin:.4rem 0;line-height:1.2;}
 .card-stars{font-size:1.4rem;margin:.5rem 0;}
 #win-msg{color:#99bbee;margin:.8rem 0;font-size:1rem;line-height:1.5;}
-.card-inter{
-  color:#0099ff;font-size:1.1rem;letter-spacing:4px;
-  margin:.8rem 0 1.5rem;font-weight:700;
-}
+.card-inter{color:#0099ff;font-size:1.1rem;letter-spacing:4px;margin:.8rem 0 1.5rem;font-weight:700;}
 .big-icon{font-size:3.5rem;margin-bottom:.3rem;}
 
 /* Confetti */
 #confetti-box{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
 .confetto{
-  position:absolute;top:-16px;
-  width:9px;height:13px;border-radius:2px;
+  position:absolute;top:-16px;width:9px;height:13px;border-radius:2px;
   animation:cffall linear forwards;
 }
 @keyframes cffall{to{transform:translateY(108vh) rotate(720deg);opacity:0;}}

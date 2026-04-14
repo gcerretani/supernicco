@@ -122,8 +122,9 @@ export class Player {
     this.isInvincible = false;
     this._invTimer   = 0;
     this._time       = 0;
-    this._facingAngle = 0;
+    this._facingAngle = Math.PI; // start facing -Z (toward goal)
     this._dead       = false;
+    this.mesh.rotation.y = Math.PI;
 
     // AABB half-extents for collision checks
     this.hx = 0.42;
@@ -141,6 +142,8 @@ export class Player {
     this.isInvincible = false;
     this._invTimer = 0;
     this._dead = false;
+    this._facingAngle = Math.PI;
+    this.mesh.rotation.y = Math.PI;
   }
 
   activatePowerup(duration = 5) {
@@ -153,13 +156,31 @@ export class Player {
     if (this._dead) return;
     this._time += dt;
 
-    // ── Movement ──────────────────────────────────────────────────────────
-    const speed = MOVE_SPEED;
-    const mx = input.x * speed;
-    const mz = input.z * speed;
+    // ── Facing direction (turn toward input) ──────────────────────────────
+    const inputLen = Math.sqrt(input.x * input.x + input.z * input.z);
+    const isMoving = inputLen > 0.08;
 
-    this.velocity.x = mx;
-    this.velocity.z = mz;
+    if (isMoving) {
+      // Target angle: atan2(x, z) gives the angle of the input vector
+      // from the +Z axis. Since the character's "front" faces -Z when
+      // rotation.y = PI, this formula makes them face the movement direction.
+      const target = Math.atan2(input.x, input.z);
+      let diff = target - this._facingAngle;
+      while (diff >  Math.PI) diff -= 2 * Math.PI;
+      while (diff < -Math.PI) diff += 2 * Math.PI;
+      this._facingAngle += diff * Math.min(1, 9 * dt);
+      this.mesh.rotation.y = this._facingAngle;
+    }
+
+    // ── Movement: always in facing direction, no strafing ─────────────────
+    if (isMoving) {
+      const speed = MOVE_SPEED * Math.min(inputLen, 1);
+      this.velocity.x = Math.sin(this._facingAngle) * speed;
+      this.velocity.z = Math.cos(this._facingAngle) * speed;
+    } else {
+      this.velocity.x = 0;
+      this.velocity.z = 0;
+    }
 
     // ── Gravity / jump ────────────────────────────────────────────────────
     this.velocity.y += GRAVITY * dt;
@@ -185,17 +206,6 @@ export class Player {
       this.isOnGround = true;
     } else {
       this.isOnGround = false;
-    }
-
-    // ── Facing direction ──────────────────────────────────────────────────
-    if (Math.abs(mx) > 0.1 || Math.abs(mz) > 0.1) {
-      const target = Math.atan2(mx, -mz);
-      // Shortest-path angle lerp
-      let diff = target - this._facingAngle;
-      while (diff >  Math.PI) diff -= 2 * Math.PI;
-      while (diff < -Math.PI) diff += 2 * Math.PI;
-      this._facingAngle += diff * Math.min(1, 12 * dt);
-      this.mesh.rotation.y = this._facingAngle;
     }
 
     // ── Walk animation ────────────────────────────────────────────────────

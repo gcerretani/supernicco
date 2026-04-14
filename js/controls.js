@@ -1,9 +1,10 @@
-// Keyboard + on-screen D-pad controls (no external dependencies)
+// Keyboard + NippleJS touch controls
 
 const keys = new Set();
-const dpad = { up: false, down: false, left: false, right: false };
+const joy = { x: 0, z: 0 };
 let _touchJump = false;
 let _jumpConsumed = false;
+let _nippleInited = false;
 
 // ── Keyboard ───────────────────────────────────────────────────────────────
 export function initKeyboard() {
@@ -14,55 +15,49 @@ export function initKeyboard() {
   window.addEventListener('keyup', e => keys.delete(e.code));
 }
 
-// ── D-pad buttons ──────────────────────────────────────────────────────────
-function bindBtn(id, flag) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const press   = e => { e.preventDefault(); dpad[flag] = true;  el.classList.add('pressed'); };
-  const release = e => { e.preventDefault(); dpad[flag] = false; el.classList.remove('pressed'); };
-  el.addEventListener('touchstart',  press,   { passive: false });
-  el.addEventListener('touchend',    release, { passive: false });
-  el.addEventListener('touchcancel', release, { passive: false });
-  // Also mouse (for desktop testing)
-  el.addEventListener('mousedown',  press);
-  el.addEventListener('mouseup',    release);
-  el.addEventListener('mouseleave', release);
-}
-
+// ── NippleJS joystick (called once, after zone-joy is visible) ─────────────
 export function initMobileControls() {
-  bindBtn('dp-up',    'up');
-  bindBtn('dp-down',  'down');
-  bindBtn('dp-left',  'left');
-  bindBtn('dp-right', 'right');
+  if (_nippleInited) return;
+  _nippleInited = true;
 
-  const jump = document.getElementById('btn-jump');
-  if (jump) {
-    const jPress   = e => { e.preventDefault(); _touchJump = true; };
-    const jRelease = e => { e.preventDefault(); _touchJump = false; };
-    jump.addEventListener('touchstart',  jPress,   { passive: false });
-    jump.addEventListener('touchend',    jRelease, { passive: false });
-    jump.addEventListener('touchcancel', jRelease, { passive: false });
-    jump.addEventListener('mousedown',  jPress);
-    jump.addEventListener('mouseup',    jRelease);
-    jump.addEventListener('mouseleave', jRelease);
+  const joyZone = document.getElementById('zone-joy');
+  const jumpBtn = document.getElementById('btn-jump');
+
+  if (joyZone && typeof nipplejs !== 'undefined') {
+    const manager = nipplejs.create({
+      zone: joyZone,
+      mode: 'dynamic',      // appears wherever you touch
+      size: 110,
+      color: 'rgba(0,102,204,0.65)',
+      fadeTime: 200,
+    });
+    manager.on('move', (_, data) => {
+      if (data.vector) {
+        joy.x =  data.vector.x;
+        joy.z = -data.vector.y; // nipplejs Y axis is inverted
+      }
+    });
+    manager.on('end', () => { joy.x = 0; joy.z = 0; });
+  }
+
+  if (jumpBtn) {
+    const press   = e => { e.preventDefault(); _touchJump = true; };
+    const release = e => { e.preventDefault(); _touchJump = false; };
+    jumpBtn.addEventListener('touchstart',  press,   { passive: false });
+    jumpBtn.addEventListener('touchend',    release, { passive: false });
+    jumpBtn.addEventListener('touchcancel', release, { passive: false });
   }
 }
 
 // ── Unified input ──────────────────────────────────────────────────────────
 export function getInput() {
-  let mx = 0, mz = 0;
+  let mx = joy.x;
+  let mz = joy.z;
 
-  // Keyboard
   if (keys.has('ArrowLeft')  || keys.has('KeyA')) mx -= 1;
   if (keys.has('ArrowRight') || keys.has('KeyD')) mx += 1;
   if (keys.has('ArrowUp')    || keys.has('KeyW')) mz -= 1;
   if (keys.has('ArrowDown')  || keys.has('KeyS')) mz += 1;
-
-  // D-pad
-  if (dpad.left)  mx -= 1;
-  if (dpad.right) mx += 1;
-  if (dpad.up)    mz -= 1;
-  if (dpad.down)  mz += 1;
 
   const len = Math.sqrt(mx * mx + mz * mz);
   if (len > 1) { mx /= len; mz /= len; }
@@ -74,10 +69,7 @@ export function getInput() {
 /** Returns true only on the leading edge of a jump press. */
 export function consumeJump() {
   const { jumpHeld } = getInput();
-  if (jumpHeld && !_jumpConsumed) {
-    _jumpConsumed = true;
-    return true;
-  }
+  if (jumpHeld && !_jumpConsumed) { _jumpConsumed = true; return true; }
   if (!jumpHeld) _jumpConsumed = false;
   return false;
 }

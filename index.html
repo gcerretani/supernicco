@@ -6,6 +6,7 @@
   <title>Super Nicco</title>
   <link rel="stylesheet" href="style.css">
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+  <script src="https://cdn.jsdelivr.net/npm/nipplejs@0.10.1/dist/nipplejs.min.js"></script>
 </head>
 <body>
   <canvas id="c"></canvas>
@@ -16,17 +17,7 @@
     <div class="subtitle">⚽ Avventura nel Chianti ⚽</div>
     <div class="hint">
       <strong>Desktop:</strong> WASD / Frecce + Spazio per saltare<br>
-      <strong>Mobile:</strong> Frecce direzionali + tasto SALTA
-    </div>
-    <!-- Mobile control preview in start screen -->
-    <div id="hint-mobile" class="hidden">
-      <div class="hint-dpad">
-        <div class="hint-row"><span class="hint-key">▲</span></div>
-        <div class="hint-row"><span class="hint-key">◀</span><span class="hint-key hint-key-center"></span><span class="hint-key">▶</span></div>
-        <div class="hint-row"><span class="hint-key">▼</span></div>
-      </div>
-      <div class="hint-plus">+</div>
-      <div class="hint-jump-preview">SALTA</div>
+      <strong>Mobile:</strong> Joystick sinistro + tasto SALTA
     </div>
     <button id="btn-play">GIOCA!</button>
   </div>
@@ -38,25 +29,17 @@
     <div id="h-timer">⏱ <span id="timer">2:00</span></div>
   </div>
 
-  <!-- Mobile controls (D-pad + jump) -->
+  <!-- Mobile controls: NippleJS zone (left) + SALTA button (right) -->
   <div id="mobile-controls" class="hidden">
-    <div id="dpad">
-      <button class="dp-btn" id="dp-up">▲</button>
-      <div class="dp-mid">
-        <button class="dp-btn" id="dp-left">◀</button>
-        <div class="dp-center"></div>
-        <button class="dp-btn" id="dp-right">▶</button>
-      </div>
-      <button class="dp-btn" id="dp-down">▼</button>
-    </div>
+    <div id="zone-joy"></div>
     <button id="btn-jump">SALTA</button>
   </div>
 
   <!-- Game Over -->
   <div id="screen-over" class="hidden">
-    <div class="big-icon">⏰</div>
-    <h2>Tempo Scaduto!</h2>
-    <p>Non ce l'hai fatta questa volta...</p>
+    <div class="big-icon" id="over-icon">⏰</div>
+    <h2 id="over-title">Tempo Scaduto!</h2>
+    <p id="over-msg">Non ce l'hai fatta questa volta...</p>
     <button class="btn-restart">Riprova!</button>
   </div>
 
