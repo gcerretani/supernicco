@@ -266,14 +266,42 @@ function buildTower(scene, x, z, getHeightAt) {
   door.position.set(x, groundY + 1.25, z + 2.8);
   scene.add(door);
 
-  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 3, 5),
-    new THREE.MeshLambertMaterial({ color: 0x888888 }));
-  pole.position.set(x, groundY + 20.5, z);
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 6, 6),
+    new THREE.MeshLambertMaterial({ color: 0xaaaaaa }));
+  pole.position.set(x, groundY + 22, z);
   scene.add(pole);
 
-  const flag = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 0.9),
-    new THREE.MeshLambertMaterial({ color: 0x0066cc, side: THREE.DoubleSide }));
-  flag.position.set(x + 0.7, groundY + 21.5, z);
+  // Inter flag — big, wavy, striped canvas texture
+  const flagW = 4.5, flagH = 2.8;
+  const flagGeo = new THREE.PlaneGeometry(flagW, flagH, 10, 5);
+  const fPos = flagGeo.attributes.position;
+  for (let i = 0; i < fPos.count; i++) {
+    const u = (fPos.getX(i) + flagW / 2) / flagW; // 0=pole side, 1=free end
+    fPos.setZ(i, Math.sin(u * Math.PI * 1.6) * 0.55 * u);
+  }
+  flagGeo.computeVertexNormals();
+
+  const flagCv  = document.createElement('canvas');
+  flagCv.width  = 256; flagCv.height = 160;
+  const fCtx    = flagCv.getContext('2d');
+  const stripes = 10;
+  const sw      = flagCv.width / stripes;
+  for (let i = 0; i < stripes; i++) {
+    fCtx.fillStyle = i % 2 === 0 ? '#000000' : '#0066cc';
+    fCtx.fillRect(i * sw, 0, sw, flagCv.height);
+  }
+  fCtx.fillStyle = '#ffffff';
+  fCtx.font = 'bold 28px Arial';
+  fCtx.textAlign = 'center';
+  fCtx.fillText('INTER', 128, 72);
+  fCtx.font = 'bold 20px Arial';
+  fCtx.fillText('★ FORZA ★', 128, 108);
+
+  const flag = new THREE.Mesh(flagGeo,
+    new THREE.MeshLambertMaterial({
+      map: new THREE.CanvasTexture(flagCv), side: THREE.DoubleSide
+    }));
+  flag.position.set(x + flagW / 2, groundY + 25 - flagH / 2, z);
   scene.add(flag);
 
   return { x, z, groundY, radius: 3.5 };

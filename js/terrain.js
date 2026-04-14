@@ -69,16 +69,34 @@ function makeCypress() {
   return g;
 }
 
-function makeVineRow(len) {
+function makeGrassFlowerClump() {
   const g = new THREE.Group();
-  const mat = new THREE.MeshLambertMaterial({ color: 0x3a7d28 });
-  for (let i = 0; i < len; i++) {
-    const post = new THREE.Mesh(new THREE.BoxGeometry(0.15, 1.2, 0.15), new THREE.MeshLambertMaterial({ color: 0x7a5c3a }));
-    post.position.set(i * 1.5, 0.6, 0);
-    g.add(post);
-    const leaves = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.5, 0.4), mat);
-    leaves.position.set(i * 1.5, 1.3, 0);
-    g.add(leaves);
+  const rng = (a, b) => a + Math.random() * (b - a);
+
+  // Grass tufts
+  const tuftMat = new THREE.MeshLambertMaterial({ color: 0x4db833 });
+  for (let i = 0; i < 9; i++) {
+    const h = rng(0.2, 0.48);
+    const t = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.12, h, 4), tuftMat);
+    t.position.set(rng(-3.2, 3.2), h / 2, rng(-0.6, 0.6));
+    g.add(t);
+  }
+
+  // Flowers
+  const stemMat  = new THREE.MeshLambertMaterial({ color: 0x3a8020 });
+  const palette  = [0xffcc00, 0xff3333, 0xffffff, 0xff88cc, 0xff8800];
+  for (let i = 0; i < 7; i++) {
+    const color  = palette[Math.floor(rng(0, palette.length))];
+    const stemH  = rng(0.32, 0.68);
+    const stem   = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, stemH, 5), stemMat);
+    stem.position.y = stemH / 2;
+    const head   = new THREE.Mesh(new THREE.SphereGeometry(0.12, 6, 4),
+                                   new THREE.MeshLambertMaterial({ color }));
+    head.position.y = stemH + 0.1;
+    const flower = new THREE.Group();
+    flower.add(stem, head);
+    flower.position.set(rng(-3.2, 3.2), 0, rng(-0.6, 0.6));
+    g.add(flower);
   }
   return g;
 }
@@ -99,16 +117,15 @@ export function createDecorations(scene) {
     scene.add(c);
   });
 
-  // Vine rows decorative — placed outside the playable corridor (x=±8)
-  for (let z = -62; z > -100; z -= 10) {
-    const row = makeVineRow(5);
-    const h = getHeightAt(-8, z);
-    row.position.set(-8, h, z);
-    scene.add(row);
-
-    const row2 = makeVineRow(5);
-    const h2 = getHeightAt(8, z);
-    row2.position.set(8, h2, z);
-    scene.add(row2);
-  }
+  // Grass & flower clumps alongside the corridor
+  const clumpPositions = [
+    [-9, -18], [9, -28], [-10, -50], [10, -65],
+    [-9, -82], [10, -98], [-10, -118], [9, -135],
+    [-9, -152], [10, -170],
+  ];
+  clumpPositions.forEach(([cx, cz]) => {
+    const clump = makeGrassFlowerClump();
+    clump.position.set(cx, getHeightAt(cx, cz), cz);
+    scene.add(clump);
+  });
 }
