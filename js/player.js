@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 const GRAVITY     = -22;   // units/s²
 const JUMP_FORCE  =  9.5;  // units/s (up)
-const MOVE_SPEED  =  8;    // units/s
+const MOVE_SPEED  = 11;    // units/s
 const PLAYER_H    =  1.8;  // character height
 const HALF_H      = PLAYER_H / 2;
 
@@ -195,8 +195,8 @@ export class Player {
     this.mesh.position.y += this.velocity.y * dt;
     this.mesh.position.z += this.velocity.z * dt;
 
-    // Clamp X so player stays on level
-    this.mesh.position.x = Math.max(-18, Math.min(18, this.mesh.position.x));
+    // Clamp X so player stays in the corridor
+    this.mesh.position.x = Math.max(-4.5, Math.min(4.5, this.mesh.position.x));
 
     // ── Terrain collision ─────────────────────────────────────────────────
     const groundY = getHeightAt(this.mesh.position.x, this.mesh.position.z) + HALF_H;

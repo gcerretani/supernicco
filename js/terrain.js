@@ -99,16 +99,16 @@ export function createDecorations(scene) {
     scene.add(c);
   });
 
-  // Vine rows in the vineyard section (z: -60 to -100)
+  // Vine rows decorative — placed outside the playable corridor (x=±8)
   for (let z = -62; z > -100; z -= 10) {
     const row = makeVineRow(5);
-    const h = getHeightAt(-4, z);
-    row.position.set(-4, h, z);
+    const h = getHeightAt(-8, z);
+    row.position.set(-8, h, z);
     scene.add(row);
 
     const row2 = makeVineRow(5);
-    const h2 = getHeightAt(4, z);
-    row2.position.set(4, h2, z);
+    const h2 = getHeightAt(8, z);
+    row2.position.set(8, h2, z);
     scene.add(row2);
   }
 }

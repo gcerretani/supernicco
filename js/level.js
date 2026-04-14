@@ -147,6 +147,52 @@ export function resolveHayBales(player, hayBales) {
   }
 }
 
+// ── Jump Hedge (solid transversal obstacle — player must jump over) ────────
+export class JumpHedge {
+  constructor(scene, z, getHeightAt) {
+    const groundY = getHeightAt(0, z);
+    const geo = new THREE.BoxGeometry(9.6, 1.2, 0.7);
+    const mat = new THREE.MeshLambertMaterial({ color: 0x2d5a1b });
+    this.mesh = new THREE.Mesh(geo, mat);
+    this.mesh.position.set(0, groundY + 0.6, z);
+    this.mesh.castShadow = true;
+    scene.add(this.mesh);
+    this.z    = z;
+    this.topY = groundY + 1.2;
+    this.hd   = 0.35; // half-depth Z
+    this.hw   = 4.8;  // half-width X
+  }
+}
+
+/** Block player from walking through hedges — they must jump over. */
+export function resolveJumpHedges(player, jumpHedges) {
+  const playerBottom = player.position.y - player.hy;
+  for (const hedge of jumpHedges) {
+    if (playerBottom >= hedge.topY - 0.05) continue; // cleared the top
+    const dz = player.position.z - hedge.z;
+    const overlapZ = (player.hz + hedge.hd) - Math.abs(dz);
+    if (overlapZ <= 0) continue; // no Z overlap
+    if (Math.abs(player.position.x) > player.hx + hedge.hw) continue; // outside X width
+    player.position.z += Math.sign(dz) * overlapZ;
+    player.velocity.z = 0;
+  }
+}
+
+// ── Side hedge walls (visual corridor boundaries) ─────────────────────────
+function makeSideHedgeWalls(scene, getHeightAt) {
+  const mat = new THREE.MeshLambertMaterial({ color: 0x2d5a1b });
+  const segLen = 6;
+  for (let z = -4; z > -186; z -= segLen) {
+    [-5.2, 5.2].forEach(wx => {
+      const groundY = getHeightAt(wx, z - segLen / 2);
+      const wall = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.4, segLen), mat);
+      wall.position.set(wx, groundY + 0.7, z - segLen / 2);
+      wall.castShadow = true;
+      scene.add(wall);
+    });
+  }
+}
+
 // ── Road sign ──────────────────────────────────────────────────────────────
 function makeRoadSign(scene, x, z, getHeightAt, lines, bgColor = '#2a7a1a') {
   const g = new THREE.Group();
@@ -229,10 +275,19 @@ function buildTower(scene, x, z, getHeightAt) {
 
 // ── Build entire level ─────────────────────────────────────────────────────
 export function buildLevel(scene, getHeightAt) {
-  const enemies   = [];
-  const balls     = [];
-  const hayBales  = [];
-  let   scarf     = null;
+  const enemies    = [];
+  const balls      = [];
+  const hayBales   = [];
+  const jumpHedges = [];
+  let   scarf      = null;
+
+  // ── Side hedge walls (corridor boundaries) ────────────────────────────
+  makeSideHedgeWalls(scene, getHeightAt);
+
+  // ── Jump hedges (siepi trasversali — vanno saltate) ────────────────────
+  [-50, -88, -110, -140, -160, -175].forEach(z => {
+    jumpHedges.push(new JumpHedge(scene, z, getHeightAt));
+  });
 
   // ── Road sign 1: Benvenuto nel Chianti (right side, near start) ────────
   makeRoadSign(scene, 7, -8, getHeightAt, [
@@ -305,5 +360,5 @@ export function buildLevel(scene, getHeightAt) {
     });
   }
 
-  return { enemies, balls, hayBales, scarf, goal };
+  return { enemies, balls, hayBales, jumpHedges, scarf, goal };
 }
