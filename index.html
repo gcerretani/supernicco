@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Super Nicco</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+  <script src="https://cdn.jsdelivr.net/npm/nipplejs@0.10.1/dist/nipplejs.min.js"></script>
+</head>
+<body>
+  <canvas id="c"></canvas>
+
+  <!-- Start Screen -->
+  <div id="screen-start">
+    <div class="logo"><span class="logo-super">SUPER</span><br><span class="logo-nicco">NICCO</span></div>
+    <div class="subtitle">⚽ Avventura nel Chianti ⚽</div>
+    <div class="hint">
+      <strong>Desktop:</strong> WASD / Frecce + Spazio per saltare<br>
+      <strong>Mobile:</strong> Joystick sinistro + tasto A
+    </div>
+    <button id="btn-play">GIOCA!</button>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud" class="hidden">
+    <div id="h-balls">⚽ <span id="balls">0</span>/5</div>
+    <div id="h-power" class="hidden">🔥 FORZA INTER!</div>
+    <div id="h-timer">⏱ <span id="timer">2:00</span></div>
+  </div>
+
+  <!-- Mobile controls -->
+  <div id="zone-joy" class="hidden"></div>
+  <button id="btn-jump" class="hidden">A</button>
+
+  <!-- Game Over -->
+  <div id="screen-over" class="hidden">
+    <div class="big-icon">⏰</div>
+    <h2>Tempo Scaduto!</h2>
+    <p>Non ce l'hai fatta questa volta...</p>
+    <button class="btn-restart">Riprova!</button>
+  </div>
+
+  <!-- Win / Birthday Card -->
+  <div id="screen-win" class="hidden">
+    <div id="confetti-box"></div>
+    <div class="bday-card">
+      <div class="big-icon">🎂</div>
+      <h1 class="card-title">TANTI AUGURI<br>NICCOLÒ!</h1>
+      <div class="card-stars">⭐ ⭐ ⭐</div>
+      <p id="win-msg"></p>
+      <div class="card-inter">⚽ FORZA INTER! ⚽</div>
+      <button class="btn-restart">Gioca Ancora!</button>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

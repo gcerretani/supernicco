@@ -1,0 +1,108 @@
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;}
+
+body{background:#000;font-family:'Arial Black',Arial,sans-serif;overflow:hidden;width:100vw;height:100vh;}
+
+#c{position:fixed;inset:0;width:100%;height:100%;display:block;}
+
+.hidden{display:none!important;}
+
+/* ── SCREENS ── */
+#screen-start,#screen-over{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.88);
+  z-index:100;color:#fff;text-align:center;padding:2rem;
+}
+
+/* Start */
+.logo{
+  line-height:1;margin-bottom:.6rem;
+  text-shadow:3px 3px 0 #000;
+}
+.logo-super{font-size:3.5rem;font-weight:900;color:#fff;letter-spacing:6px;}
+.logo-nicco{font-size:5rem;font-weight:900;color:#0066cc;letter-spacing:4px;
+  -webkit-text-stroke:2px #0099ff;text-stroke:2px #0099ff;}
+.subtitle{font-size:1.2rem;color:#88aacc;margin-bottom:.8rem;letter-spacing:2px;}
+.hint{font-size:.75rem;color:#556;margin-bottom:2rem;line-height:1.7;}
+
+/* Buttons */
+#btn-play,.btn-restart{
+  background:linear-gradient(135deg,#0066cc,#003d99);
+  color:#fff;border:3px solid #0099ff;border-radius:10px;
+  padding:.9rem 2.8rem;font-size:1.4rem;font-weight:900;
+  cursor:pointer;text-transform:uppercase;letter-spacing:3px;
+  box-shadow:0 4px 24px rgba(0,102,204,.6);
+  transition:transform .1s,box-shadow .1s;
+}
+#btn-play:hover,.btn-restart:hover{box-shadow:0 6px 32px rgba(0,153,255,.8);}
+#btn-play:active,.btn-restart:active{transform:scale(.95);}
+
+/* HUD */
+#hud{
+  position:fixed;top:0;left:0;right:0;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.55rem 1.1rem;
+  background:linear-gradient(180deg,rgba(0,0,0,.72)0%,transparent 100%);
+  color:#fff;font-size:1.15rem;font-weight:700;
+  z-index:50;pointer-events:none;
+}
+#h-balls{color:#e8e8e8;}
+#h-power{
+  color:#00ccff;font-size:.9rem;letter-spacing:2px;
+  animation:blink .45s infinite alternate;
+}
+#h-timer{color:#e8e8e8;}
+#h-timer.urgent{color:#ff4444;animation:blink .45s infinite alternate;}
+@keyframes blink{from{opacity:1;}to{opacity:.3;}}
+
+/* Mobile controls */
+#zone-joy{
+  position:fixed;bottom:16px;left:16px;
+  width:140px;height:140px;z-index:50;
+}
+#btn-jump{
+  position:fixed;bottom:26px;right:26px;
+  width:82px;height:82px;border-radius:50%;
+  background:rgba(0,102,204,.65);color:#fff;
+  border:3px solid #0099ff;font-size:2rem;font-weight:900;
+  cursor:pointer;z-index:50;touch-action:none;
+}
+
+/* Game Over */
+#screen-over{background:rgba(8,0,0,.93);}
+#screen-over h2{font-size:2.4rem;color:#ff4444;margin:.8rem 0 .4rem;}
+#screen-over p{color:#888;margin-bottom:2rem;}
+
+/* Win Card */
+#screen-win{
+  position:fixed;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  z-index:100;
+  background:rgba(0,0,18,.96);
+}
+.bday-card{
+  background:linear-gradient(145deg,#08082a,#001a50);
+  border:3px solid #0066cc;border-radius:22px;
+  padding:2.5rem 2rem;max-width:430px;width:92%;
+  text-align:center;position:relative;z-index:1;
+  box-shadow:0 0 60px rgba(0,102,204,.45),0 0 120px rgba(0,60,150,.25);
+  animation:cardIn .6s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes cardIn{from{transform:scale(.7) translateY(40px);opacity:0;}to{transform:none;opacity:1;}}
+.card-title{font-size:2.1rem;color:#fff;margin:.4rem 0;line-height:1.2;}
+.card-stars{font-size:1.4rem;margin:.5rem 0;}
+#win-msg{color:#99bbee;margin:.8rem 0;font-size:1rem;line-height:1.5;}
+.card-inter{
+  color:#0099ff;font-size:1.1rem;letter-spacing:4px;
+  margin:.8rem 0 1.5rem;font-weight:700;
+}
+.big-icon{font-size:3.5rem;margin-bottom:.3rem;}
+
+/* Confetti */
+#confetti-box{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.confetto{
+  position:absolute;top:-16px;
+  width:9px;height:13px;border-radius:2px;
+  animation:cffall linear forwards;
+}
+@keyframes cffall{to{transform:translateY(108vh) rotate(720deg);opacity:0;}}
