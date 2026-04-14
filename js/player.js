@@ -210,7 +210,6 @@ export class Player {
 
     // ── Walk animation ────────────────────────────────────────────────────
     const { leftArm, rightArm, leftLeg, rightLeg } = this.mesh.userData;
-    const isMoving = Math.abs(mx) > 0.1 || Math.abs(mz) > 0.1;
     const swing = isMoving ? Math.sin(this._time * 9) * 0.65 : 0;
     leftLeg.rotation.x  =  swing;
     rightLeg.rotation.x = -swing;
