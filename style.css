@@ -55,17 +55,63 @@ body{background:#000;font-family:'Arial Black',Arial,sans-serif;overflow:hidden;
 #h-timer.urgent{color:#ff4444;animation:blink .45s infinite alternate;}
 @keyframes blink{from{opacity:1;}to{opacity:.3;}}
 
-/* Mobile controls */
-#zone-joy{
-  position:fixed;bottom:16px;left:16px;
-  width:140px;height:140px;z-index:50;
+/* ── Mobile D-pad ── */
+#mobile-controls{
+  position:fixed;bottom:0;left:0;right:0;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  padding:10px 22px 18px;
+  pointer-events:none;
+  z-index:50;
 }
+#dpad{
+  display:flex;flex-direction:column;align-items:center;
+  gap:3px;pointer-events:auto;
+}
+.dp-mid{display:flex;align-items:center;gap:3px;}
+.dp-btn{
+  width:64px;height:64px;border-radius:12px;
+  background:rgba(0,0,0,.58);border:2.5px solid rgba(0,153,255,.7);
+  color:#fff;font-size:1.6rem;
+  cursor:pointer;touch-action:none;pointer-events:auto;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .1s;
+  -webkit-user-select:none;
+}
+.dp-btn:active,.dp-btn.pressed{background:rgba(0,102,204,.75);}
+.dp-center{width:64px;height:64px;}
 #btn-jump{
-  position:fixed;bottom:26px;right:26px;
-  width:82px;height:82px;border-radius:50%;
-  background:rgba(0,102,204,.65);color:#fff;
-  border:3px solid #0099ff;font-size:2rem;font-weight:900;
-  cursor:pointer;z-index:50;touch-action:none;
+  width:96px;height:96px;border-radius:50%;
+  background:rgba(0,102,204,.72);color:#fff;
+  border:3px solid #0099ff;font-size:1rem;font-weight:900;
+  cursor:pointer;touch-action:none;pointer-events:auto;
+  letter-spacing:1px;line-height:1.2;
+  box-shadow:0 4px 20px rgba(0,102,204,.5);
+  -webkit-user-select:none;
+}
+#btn-jump:active{background:rgba(0,60,180,.85);}
+
+/* Mobile hint on start screen */
+#hint-mobile{
+  display:flex;align-items:center;gap:1.2rem;
+  margin:.5rem 0 1.5rem;padding:.8rem 1.2rem;
+  background:rgba(0,102,204,.12);border:1px solid rgba(0,153,255,.3);
+  border-radius:12px;
+}
+.hint-dpad{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.hint-row{display:flex;gap:3px;}
+.hint-key{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:34px;height:34px;background:rgba(0,0,0,.5);
+  border:1.5px solid rgba(0,153,255,.6);border-radius:6px;
+  font-size:.9rem;color:#fff;
+}
+.hint-key-center{border:none;background:transparent;}
+.hint-plus{font-size:1.4rem;color:#555;}
+.hint-jump-preview{
+  width:60px;height:60px;border-radius:50%;
+  background:rgba(0,102,204,.6);border:2px solid #0099ff;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:.8rem;font-weight:900;letter-spacing:1px;
 }
 
 /* Game Over */

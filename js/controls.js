@@ -1,55 +1,68 @@
-// Keyboard + NippleJS touch controls
+// Keyboard + on-screen D-pad controls (no external dependencies)
 
 const keys = new Set();
-const joy = { x: 0, z: 0 };
+const dpad = { up: false, down: false, left: false, right: false };
 let _touchJump = false;
 let _jumpConsumed = false;
 
+// ── Keyboard ───────────────────────────────────────────────────────────────
 export function initKeyboard() {
   window.addEventListener('keydown', e => {
     keys.add(e.code);
-    // Prevent spacebar from scrolling
     if (e.code === 'Space') e.preventDefault();
   });
   window.addEventListener('keyup', e => keys.delete(e.code));
 }
 
-export function initMobileControls() {
-  const joyZone = document.getElementById('zone-joy');
-  const jumpBtn = document.getElementById('btn-jump');
-  joyZone.classList.remove('hidden');
-  jumpBtn.classList.remove('hidden');
-
-  const manager = nipplejs.create({
-    zone: joyZone,
-    mode: 'static',
-    position: { left: '70px', bottom: '70px' },
-    size: 120,
-    color: 'rgba(0,102,204,0.55)',
-    fadeTime: 0,
-  });
-
-  manager.on('move', (_, data) => {
-    if (data.vector) {
-      joy.x = data.vector.x;
-      joy.z = -data.vector.y; // nipplejs Y is inverted
-    }
-  });
-  manager.on('end', () => { joy.x = 0; joy.z = 0; });
-
-  jumpBtn.addEventListener('touchstart', e => { e.preventDefault(); _touchJump = true; }, { passive: false });
-  jumpBtn.addEventListener('touchend',   e => { e.preventDefault(); _touchJump = false; }, { passive: false });
+// ── D-pad buttons ──────────────────────────────────────────────────────────
+function bindBtn(id, flag) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const press   = e => { e.preventDefault(); dpad[flag] = true;  el.classList.add('pressed'); };
+  const release = e => { e.preventDefault(); dpad[flag] = false; el.classList.remove('pressed'); };
+  el.addEventListener('touchstart',  press,   { passive: false });
+  el.addEventListener('touchend',    release, { passive: false });
+  el.addEventListener('touchcancel', release, { passive: false });
+  // Also mouse (for desktop testing)
+  el.addEventListener('mousedown',  press);
+  el.addEventListener('mouseup',    release);
+  el.addEventListener('mouseleave', release);
 }
 
-/** Returns current movement vector (normalized) and whether jump is held. */
-export function getInput() {
-  let mx = joy.x;
-  let mz = joy.z;
+export function initMobileControls() {
+  bindBtn('dp-up',    'up');
+  bindBtn('dp-down',  'down');
+  bindBtn('dp-left',  'left');
+  bindBtn('dp-right', 'right');
 
+  const jump = document.getElementById('btn-jump');
+  if (jump) {
+    const jPress   = e => { e.preventDefault(); _touchJump = true; };
+    const jRelease = e => { e.preventDefault(); _touchJump = false; };
+    jump.addEventListener('touchstart',  jPress,   { passive: false });
+    jump.addEventListener('touchend',    jRelease, { passive: false });
+    jump.addEventListener('touchcancel', jRelease, { passive: false });
+    jump.addEventListener('mousedown',  jPress);
+    jump.addEventListener('mouseup',    jRelease);
+    jump.addEventListener('mouseleave', jRelease);
+  }
+}
+
+// ── Unified input ──────────────────────────────────────────────────────────
+export function getInput() {
+  let mx = 0, mz = 0;
+
+  // Keyboard
   if (keys.has('ArrowLeft')  || keys.has('KeyA')) mx -= 1;
   if (keys.has('ArrowRight') || keys.has('KeyD')) mx += 1;
   if (keys.has('ArrowUp')    || keys.has('KeyW')) mz -= 1;
   if (keys.has('ArrowDown')  || keys.has('KeyS')) mz += 1;
+
+  // D-pad
+  if (dpad.left)  mx -= 1;
+  if (dpad.right) mx += 1;
+  if (dpad.up)    mz -= 1;
+  if (dpad.down)  mz += 1;
 
   const len = Math.sqrt(mx * mx + mz * mz);
   if (len > 1) { mx /= len; mz /= len; }
@@ -58,10 +71,7 @@ export function getInput() {
   return { x: mx, z: mz, jumpHeld };
 }
 
-/**
- * Returns true only on the leading edge of a jump press.
- * Must be called every frame.
- */
+/** Returns true only on the leading edge of a jump press. */
 export function consumeJump() {
   const { jumpHeld } = getInput();
   if (jumpHeld && !_jumpConsumed) {

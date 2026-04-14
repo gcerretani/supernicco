@@ -7,7 +7,7 @@ import { buildLevel } from './level.js';
 import {
   showStartScreen, hideStartScreen, showHUD, hideHUD,
   updateBalls, updateTimer, showGameOver, showWinCard,
-  onPlayClick, onRestart, initMobileDetect,
+  onPlayClick, onRestart, isMobile,
 } from './ui.js';
 
 // ── Game states ────────────────────────────────────────────────────────────
@@ -51,9 +51,7 @@ function init() {
   player = new Player(sceneObjs.scene);
 
   initKeyboard();
-  if (initMobileDetect()) {
-    initMobileControls();
-  }
+  initMobileControls(); // wires D-pad buttons (no-op on desktop, safe to always call)
 
   showStartScreen();
 
@@ -83,7 +81,7 @@ function startGame() {
   hideStartScreen();
   document.getElementById('screen-over').classList.add('hidden');
   document.getElementById('screen-win').classList.add('hidden');
-  showHUD();
+  showHUD(isMobile);
 
   state = STATE.PLAYING;
 }

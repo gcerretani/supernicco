@@ -2,6 +2,8 @@
 
 const $ = id => document.getElementById(id);
 
+export const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
 // ── Confetti ───────────────────────────────────────────────────────────────
 const CONFETTI_COLORS = [
   '#0066cc','#0099ff','#003d99',
@@ -15,12 +17,12 @@ function spawnConfetti() {
   for (let i = 0; i < 120; i++) {
     const el = document.createElement('div');
     el.className = 'confetto';
-    el.style.left    = Math.random() * 100 + 'vw';
-    el.style.background = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
-    el.style.width   = (6 + Math.random() * 8) + 'px';
-    el.style.height  = (8 + Math.random() * 10) + 'px';
-    el.style.animationDuration = (1.8 + Math.random() * 2.2) + 's';
-    el.style.animationDelay   = (Math.random() * 1.5) + 's';
+    el.style.left               = Math.random() * 100 + 'vw';
+    el.style.background         = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+    el.style.width              = (6 + Math.random() * 8) + 'px';
+    el.style.height             = (8 + Math.random() * 10) + 'px';
+    el.style.animationDuration  = (1.8 + Math.random() * 2.2) + 's';
+    el.style.animationDelay     = (Math.random() * 1.5) + 's';
     box.appendChild(el);
   }
 }
@@ -31,20 +33,24 @@ export function showStartScreen() {
   $('screen-over').classList.add('hidden');
   $('screen-win').classList.add('hidden');
   $('hud').classList.add('hidden');
-  $('zone-joy').classList.add('hidden');
-  $('btn-jump').classList.add('hidden');
+  $('mobile-controls').classList.add('hidden');
+
+  // Show mobile hint diagram on touch devices
+  if (isMobile) $('hint-mobile').classList.remove('hidden');
 }
 
 export function hideStartScreen() {
   $('screen-start').style.display = 'none';
 }
 
-export function showHUD() {
+export function showHUD(withMobile = false) {
   $('hud').classList.remove('hidden');
+  if (withMobile) $('mobile-controls').classList.remove('hidden');
 }
 
 export function hideHUD() {
   $('hud').classList.add('hidden');
+  $('mobile-controls').classList.add('hidden');
 }
 
 export function updateBalls(n) {
@@ -55,16 +61,13 @@ export function updateTimer(seconds) {
   const m = Math.floor(seconds / 60);
   const s = Math.floor(seconds % 60);
   $('timer').textContent = m + ':' + String(s).padStart(2, '0');
-  if (seconds <= 30) {
-    $('h-timer').classList.add('urgent');
-  } else {
-    $('h-timer').classList.remove('urgent');
-  }
+  $('h-timer').classList.toggle('urgent', seconds <= 30);
 }
 
 export function showGameOver() {
   $('screen-over').classList.remove('hidden');
   $('hud').classList.add('hidden');
+  $('mobile-controls').classList.add('hidden');
 }
 
 export function showWinCard(elapsedSeconds, ballCount) {
@@ -76,6 +79,7 @@ export function showWinCard(elapsedSeconds, ballCount) {
     : `Hai completato il Chianti in ${timeStr} raccogliendo ${ballCount}/5 palloni. Grande, campione!`;
   $('win-msg').textContent = msg;
   $('screen-win').classList.remove('hidden');
+  $('mobile-controls').classList.add('hidden');
   spawnConfetti();
 }
 
@@ -84,13 +88,5 @@ export function onPlayClick(cb) {
 }
 
 export function onRestart(cb) {
-  // Both restart buttons
-  document.querySelectorAll('.btn-restart').forEach(btn => {
-    btn.addEventListener('click', cb);
-  });
-}
-
-export function initMobileDetect() {
-  // Show mobile controls on touch devices or small screens
-  return ('ontouchstart' in window) || (window.innerWidth < 800);
+  document.querySelectorAll('.btn-restart').forEach(btn => btn.addEventListener('click', cb));
 }
