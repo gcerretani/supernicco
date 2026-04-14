@@ -147,35 +147,41 @@ export function resolveHayBales(player, hayBales) {
   }
 }
 
-// ── Jump Hedge (solid transversal obstacle — player must jump over) ────────
-export class JumpHedge {
-  constructor(scene, z, getHeightAt) {
-    const groundY = getHeightAt(0, z);
-    const geo = new THREE.BoxGeometry(9.6, 1.2, 0.7);
-    const mat = new THREE.MeshLambertMaterial({ color: 0x2d5a1b });
-    this.mesh = new THREE.Mesh(geo, mat);
-    this.mesh.position.set(0, groundY + 0.6, z);
-    this.mesh.castShadow = true;
-    scene.add(this.mesh);
-    this.z    = z;
-    this.topY = groundY + 1.2;
-    this.hd   = 0.35; // half-depth Z
-    this.hw   = 4.8;  // half-width X
-  }
-}
+// ── Flower Patch (decorative strip — no collision, just visual) ───────────
+function makeFlowerPatch(scene, z, getHeightAt) {
+  const g = new THREE.Group();
+  const rng = (a, b) => a + Math.random() * (b - a);
 
-/** Block player from walking through hedges — they must jump over. */
-export function resolveJumpHedges(player, jumpHedges) {
-  const playerBottom = player.position.y - player.hy;
-  for (const hedge of jumpHedges) {
-    if (playerBottom >= hedge.topY - 0.05) continue; // cleared the top
-    const dz = player.position.z - hedge.z;
-    const overlapZ = (player.hz + hedge.hd) - Math.abs(dz);
-    if (overlapZ <= 0) continue; // no Z overlap
-    if (Math.abs(player.position.x) > player.hx + hedge.hw) continue; // outside X width
-    player.position.z += Math.sign(dz) * overlapZ;
-    player.velocity.z = 0;
+  // Grass tufts
+  const tuftMat = new THREE.MeshLambertMaterial({ color: 0x4db833 });
+  for (let i = 0; i < 22; i++) {
+    const h = rng(0.22, 0.5);
+    const t = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.11, h, 4), tuftMat);
+    t.position.set(rng(-4.5, 4.5), h / 2, rng(-0.9, 0.9));
+    g.add(t);
   }
+
+  // Flowers: stem + round head
+  const stemMat = new THREE.MeshLambertMaterial({ color: 0x3a8020 });
+  const palette = [0xffcc00, 0xff3333, 0xffffff, 0xff88cc, 0xff8800, 0xcc44ff];
+  for (let i = 0; i < 14; i++) {
+    const color = palette[Math.floor(rng(0, palette.length))];
+    const stemH = rng(0.35, 0.75);
+    const stem  = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, stemH, 5),
+                                  stemMat);
+    stem.position.y = stemH / 2;
+    const head  = new THREE.Mesh(new THREE.SphereGeometry(0.13, 6, 4),
+                                  new THREE.MeshLambertMaterial({ color }));
+    head.position.y = stemH + 0.11;
+    const flower = new THREE.Group();
+    flower.add(stem, head);
+    flower.position.set(rng(-4.5, 4.5), 0, rng(-0.85, 0.85));
+    g.add(flower);
+  }
+
+  const groundY = getHeightAt(0, z);
+  g.position.set(0, groundY, z);
+  scene.add(g);
 }
 
 // ── Side hedge walls (visual corridor boundaries) ─────────────────────────
@@ -208,25 +214,25 @@ function makeRoadSign(scene, x, z, getHeightAt, lines, bgColor = '#2a7a1a') {
 
   // Sign board via canvas texture
   const cv = document.createElement('canvas');
-  cv.width = 256; cv.height = 140;
+  cv.width = 320; cv.height = 200;
   const ctx = cv.getContext('2d');
   ctx.fillStyle = bgColor;
-  ctx.fillRect(0, 0, 256, 140);
+  ctx.fillRect(0, 0, 320, 200);
   ctx.strokeStyle = '#ffffff';
-  ctx.lineWidth = 5;
-  ctx.strokeRect(4, 4, 248, 132);
+  ctx.lineWidth = 6;
+  ctx.strokeRect(5, 5, 310, 190);
   ctx.fillStyle = '#ffffff';
   ctx.textAlign = 'center';
   lines.forEach(({ text, size, y }) => {
-    ctx.font = `bold ${size}px Arial`;
-    ctx.fillText(text, 128, y);
+    ctx.font = `bold ${Math.round(size * 1.35)}px Arial`;
+    ctx.fillText(text, 160, Math.round(y * 1.38));
   });
 
   const board = new THREE.Mesh(
-    new THREE.BoxGeometry(2.6, 1.4, 0.1),
+    new THREE.BoxGeometry(4.0, 2.5, 0.12),
     new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(cv), side: THREE.DoubleSide })
   );
-  board.position.y = 3.6;
+  board.position.y = 4.45;
   g.add(board);
 
   g.position.set(x, groundY, z);
@@ -278,15 +284,14 @@ export function buildLevel(scene, getHeightAt) {
   const enemies    = [];
   const balls      = [];
   const hayBales   = [];
-  const jumpHedges = [];
   let   scarf      = null;
 
   // ── Side hedge walls (corridor boundaries) ────────────────────────────
   makeSideHedgeWalls(scene, getHeightAt);
 
-  // ── Jump hedges (siepi trasversali — vanno saltate) ────────────────────
-  [-50, -88, -110, -140, -160, -175].forEach(z => {
-    jumpHedges.push(new JumpHedge(scene, z, getHeightAt));
+  // ── Flower patches (decorative strips along the path) ─────────────────
+  [-40, -80, -120, -162].forEach(z => {
+    makeFlowerPatch(scene, z, getHeightAt);
   });
 
   // ── Road sign 1: Benvenuto nel Chianti (right side, near start) ────────
@@ -360,5 +365,5 @@ export function buildLevel(scene, getHeightAt) {
     });
   }
 
-  return { enemies, balls, hayBales, jumpHedges, scarf, goal };
+  return { enemies, balls, hayBales, scarf, goal };
 }

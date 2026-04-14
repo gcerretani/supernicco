@@ -3,7 +3,7 @@ import { initScene, render } from './scene.js';
 import { getHeightAt, createTerrain, createDecorations } from './terrain.js';
 import { Player } from './player.js';
 import { initKeyboard, initMobileControls, getInput, consumeJump } from './controls.js';
-import { buildLevel, resolveHayBales, resolveJumpHedges } from './level.js';
+import { buildLevel, resolveHayBales } from './level.js';
 import {
   showStartScreen, hideStartScreen, showHUD, hideHUD,
   updateBalls, updateTimer, showGameOver, showWinCard,
@@ -165,7 +165,6 @@ function loop(ts = 0) {
 
     // Solid obstacle push-back (hay bales + jump hedges)
     resolveHayBales(player, level.hayBales);
-    resolveJumpHedges(player, level.jumpHedges);
 
     // Enemies
     for (const e of level.enemies) {
